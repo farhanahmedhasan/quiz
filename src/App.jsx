@@ -1,8 +1,10 @@
+import Header from "./Header"
+
 function App() {
   return (
-    <>
-        <h1>Quiz</h1>
-    </>
+    <div className="app">
+      <Header/>
+    </div>
   )
 }
 
