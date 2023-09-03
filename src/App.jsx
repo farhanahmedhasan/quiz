@@ -2,8 +2,9 @@ import Error from "./Error";
 import Header from "./Header";
 import Loader from "./Loader";
 import MainContent from "./MainContent";
-import { useEffect, useReducer } from "react";
+import Question from "./Question";
 import StartScreen from "./StartScreen";
+import { useEffect, useReducer } from "react";
 
 const initialState = {
     questions: [],
@@ -26,6 +27,12 @@ function reducer(state, action) {
                 status: "error",
             };
 
+        case "quizStart":
+            return {
+                ...state,
+                status: "active",
+            };
+
         default:
             return state;
     }
@@ -46,8 +53,6 @@ function App() {
                     return dispatch({ type: "dataFailed" });
                 }
 
-                console.log(res.status);
-
                 dispatch({ type: "dataReceived", payload: data });
             } catch (error) {
                 console.log(error);
@@ -58,13 +63,18 @@ function App() {
         fetchQuestions();
     }, []);
 
+    function handleQuizStart() {
+        dispatch({ type: "quizStart" });
+    }
+
     return (
         <div className="app">
             <Header />
             <MainContent>
                 {status === "loading" && <Loader />}
                 {status === "error" && <Error />}
-                {status === "ready" && <StartScreen numQuestion={numQuestion} />}
+                {status === "ready" && <StartScreen numQuestion={numQuestion} onQuizStart={handleQuizStart} />}
+                {status === "active" && <Question />}
             </MainContent>
         </div>
     );
