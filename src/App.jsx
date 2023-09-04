@@ -10,6 +10,7 @@ const initialState = {
     questions: [],
     //"loading", "error", "ready", "active", "finished"
     status: "loading",
+    curQuesIndex: 0,
 };
 
 function reducer(state, action) {
@@ -33,15 +34,22 @@ function reducer(state, action) {
                 status: "active",
             };
 
+        case "nextQuestion":
+            return {
+                ...state,
+                curQuesIndex: state.curQuesIndex + 1,
+            };
+
         default:
             return state;
     }
 }
 
 function App() {
-    const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
+    const [{ questions, status, curQuesIndex }, dispatch] = useReducer(reducer, initialState);
 
     const numQuestion = questions.length;
+    const hasMoreQuestion = numQuestion > curQuesIndex + 1;
 
     useEffect(() => {
         async function fetchQuestions() {
@@ -67,6 +75,10 @@ function App() {
         dispatch({ type: "quizStart" });
     }
 
+    function handleNextQuestion() {
+        dispatch({ type: "nextQuestion" });
+    }
+
     return (
         <div className="app">
             <Header />
@@ -74,7 +86,13 @@ function App() {
                 {status === "loading" && <Loader />}
                 {status === "error" && <Error />}
                 {status === "ready" && <StartScreen numQuestion={numQuestion} onQuizStart={handleQuizStart} />}
-                {status === "active" && <Question />}
+                {status === "active" && (
+                    <Question
+                        question={questions[curQuesIndex]}
+                        onNextQuestion={handleNextQuestion}
+                        hasMoreQuestion={hasMoreQuestion}
+                    />
+                )}
             </MainContent>
         </div>
     );
