@@ -12,6 +12,7 @@ const initialState = {
     status: "loading",
     curQuesIndex: 0,
     curQuesAnsIndex: null,
+    points: 0,
 };
 
 function reducer(state, action) {
@@ -43,9 +44,13 @@ function reducer(state, action) {
             };
 
         case "newAnswer": {
+            const question = state.questions[state.curQuesIndex];
+            const isCorrectAnswer = question.correctOption === action.payload;
+
             return {
                 ...state,
                 curQuesAnsIndex: action.payload,
+                points: isCorrectAnswer ? state.points + question.points : state.points,
             };
         }
 
@@ -84,8 +89,8 @@ function App() {
         dispatch({ type: "quizStart" });
     }
 
-    function handleNewAnswer(newAnswer) {
-        dispatch({ type: "newAnswer", payload: newAnswer });
+    function handleNewAnswer(index) {
+        dispatch({ type: "newAnswer", payload: index });
     }
 
     function handleNextQuestion() {
