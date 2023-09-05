@@ -164,6 +164,25 @@ h4 {
     text-align: left;
 }
 
+.btn-option.correct {
+    background-color: var(--color-theme);
+    border: 2px solid var(--color-theme);
+    color: var(--color-light);
+}
+.btn-option.wrong {
+    background-color: var(--color-accent);
+    border: 2px solid var(--color-accent);
+    color: var(--color-darkest);
+}
+
+.btn-option:not([disabled]):hover {
+    transform: translateX(1.2rem);
+}
+
+.answer {
+    transform: translateX(2rem);
+}
+
 /* ********** */
 /* First counter example */
 .counter {

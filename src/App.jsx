@@ -11,6 +11,7 @@ const initialState = {
     //"loading", "error", "ready", "active", "finished"
     status: "loading",
     curQuesIndex: 0,
+    curQuesAnsIndex: null,
 };
 
 function reducer(state, action) {
@@ -38,7 +39,15 @@ function reducer(state, action) {
             return {
                 ...state,
                 curQuesIndex: state.curQuesIndex + 1,
+                curQuesAnsIndex: null,
             };
+
+        case "newAnswer": {
+            return {
+                ...state,
+                curQuesAnsIndex: action.payload,
+            };
+        }
 
         default:
             return state;
@@ -46,7 +55,7 @@ function reducer(state, action) {
 }
 
 function App() {
-    const [{ questions, status, curQuesIndex }, dispatch] = useReducer(reducer, initialState);
+    const [{ questions, status, curQuesIndex, curQuesAnsIndex }, dispatch] = useReducer(reducer, initialState);
 
     const numQuestion = questions.length;
     const hasMoreQuestion = numQuestion > curQuesIndex + 1;
@@ -75,6 +84,10 @@ function App() {
         dispatch({ type: "quizStart" });
     }
 
+    function handleNewAnswer(newAnswer) {
+        dispatch({ type: "newAnswer", payload: newAnswer });
+    }
+
     function handleNextQuestion() {
         dispatch({ type: "nextQuestion" });
     }
@@ -89,6 +102,8 @@ function App() {
                 {status === "active" && (
                     <Question
                         question={questions[curQuesIndex]}
+                        curQuesAnsIndex={curQuesAnsIndex}
+                        onNewAnswer={handleNewAnswer}
                         onNextQuestion={handleNextQuestion}
                         hasMoreQuestion={hasMoreQuestion}
                     />

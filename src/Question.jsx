@@ -1,10 +1,10 @@
 import Options from "./Options";
 
-export default function Question({ question, onNextQuestion, hasMoreQuestion }) {
+export default function Question({ question, curQuesAnsIndex, onNewAnswer, onNextQuestion, hasMoreQuestion }) {
     return (
         <div>
             <h4>{question.question}</h4>
-            <Options question={question} />
+            <Options question={question} curQuesAnsIndex={curQuesAnsIndex} onNewAnswer={onNewAnswer} />
 
             {hasMoreQuestion && (
                 <button className="btn btn-ui" onClick={onNextQuestion}>
