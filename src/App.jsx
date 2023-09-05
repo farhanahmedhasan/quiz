@@ -105,13 +105,20 @@ function App() {
                 {status === "error" && <Error />}
                 {status === "ready" && <StartScreen numQuestion={numQuestion} onQuizStart={handleQuizStart} />}
                 {status === "active" && (
-                    <Question
-                        question={questions[curQuesIndex]}
-                        curQuesAnsIndex={curQuesAnsIndex}
-                        onNewAnswer={handleNewAnswer}
-                        onNextQuestion={handleNextQuestion}
-                        hasMoreQuestion={hasMoreQuestion}
-                    />
+                    <>
+                        <Question
+                            question={questions[curQuesIndex]}
+                            curQuesAnsIndex={curQuesAnsIndex}
+                            onNewAnswer={handleNewAnswer}
+                            onNextQuestion={handleNextQuestion}
+                            hasMoreQuestion={hasMoreQuestion}
+                        />
+                        {hasMoreQuestion && curQuesAnsIndex !== null && (
+                            <button className="btn btn-ui" onClick={handleNextQuestion}>
+                                Next
+                            </button>
+                        )}
+                    </>
                 )}
             </MainContent>
         </div>
