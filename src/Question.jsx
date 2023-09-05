@@ -6,7 +6,7 @@ export default function Question({ question, curQuesAnsIndex, onNewAnswer, onNex
             <h4>{question.question}</h4>
             <Options question={question} curQuesAnsIndex={curQuesAnsIndex} onNewAnswer={onNewAnswer} />
 
-            {hasMoreQuestion && (
+            {hasMoreQuestion && curQuesAnsIndex !== null && (
                 <button className="btn btn-ui" onClick={onNextQuestion}>
                     Next
                 </button>
