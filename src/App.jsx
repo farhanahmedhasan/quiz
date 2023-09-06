@@ -69,6 +69,14 @@ function reducer(state, action) {
             };
         }
 
+        case "quizRestart": {
+            return {
+                ...state,
+                status: "ready",
+                points: 0,
+            };
+        }
+
         default:
             return state;
     }
@@ -122,6 +130,10 @@ function App() {
         }
     }
 
+    function handleRestart() {
+        dispatch({ type: "quizRestart" });
+    }
+
     return (
         <div className="app">
             <Header />
@@ -154,7 +166,12 @@ function App() {
                 )}
 
                 {status === "finished" && (
-                    <FinishScreen points={points} totalPoints={totalPoints} highScore={highScore} />
+                    <FinishScreen
+                        points={points}
+                        totalPoints={totalPoints}
+                        highScore={highScore}
+                        onReStart={handleRestart}
+                    />
                 )}
             </MainContent>
         </div>
