@@ -1,10 +1,11 @@
 import Error from "./Error";
 import Header from "./Header";
 import Loader from "./Loader";
-import MainContent from "./MainContent";
+import Progress from "./Progress";
 import Question from "./Question";
+import MainContent from "./MainContent";
 import StartScreen from "./StartScreen";
-import { useEffect, useReducer } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 
 const initialState = {
     questions: [],
@@ -60,10 +61,11 @@ function reducer(state, action) {
 }
 
 function App() {
-    const [{ questions, status, curQuesIndex, curQuesAnsIndex }, dispatch] = useReducer(reducer, initialState);
+    const [{ questions, status, curQuesIndex, curQuesAnsIndex, points }, dispatch] = useReducer(reducer, initialState);
 
     const numQuestion = questions.length;
     const hasMoreQuestion = numQuestion > curQuesIndex + 1;
+    const totalPoints = useMemo(() => questions.reduce((acc, cur) => acc + cur.points, 0), [questions]);
 
     useEffect(() => {
         async function fetchQuestions() {
@@ -106,6 +108,13 @@ function App() {
                 {status === "ready" && <StartScreen numQuestion={numQuestion} onQuizStart={handleQuizStart} />}
                 {status === "active" && (
                     <>
+                        <Progress
+                            numQuestion={numQuestion}
+                            curQuesIndex={curQuesIndex}
+                            points={points}
+                            totalPoints={totalPoints}
+                            curQuesAnsIndex={curQuesAnsIndex}
+                        />
                         <Question
                             question={questions[curQuesIndex]}
                             curQuesAnsIndex={curQuesAnsIndex}
