@@ -7,6 +7,9 @@ import MainContent from "./MainContent";
 import StartScreen from "./StartScreen";
 import FinishScreen from "./FinishScreen";
 import { useEffect, useMemo, useReducer } from "react";
+import Timer from "./Timer";
+
+const SECS_PER_QUS = 30;
 
 const initialState = {
     questions: [],
@@ -16,6 +19,7 @@ const initialState = {
     curQuesAnsIndex: null,
     points: 0,
     highScore: 0,
+    timeRemains: null,
 };
 
 function reducer(state, action) {
@@ -37,6 +41,7 @@ function reducer(state, action) {
             return {
                 ...state,
                 status: "active",
+                timeRemains: state.questions.length * SECS_PER_QUS,
             };
 
         case "nextQuestion":
@@ -63,8 +68,6 @@ function reducer(state, action) {
             return {
                 ...state,
                 status: "finished",
-                curQuesIndex: 0,
-                curQuesAnsIndex: null,
                 highScore: newHighScore,
             };
         }
@@ -74,6 +77,19 @@ function reducer(state, action) {
                 ...state,
                 status: "ready",
                 points: 0,
+                curQuesIndex: 0,
+                curQuesAnsIndex: null,
+            };
+        }
+
+        case "timerCounter": {
+            const newHighScore = state.points > state.highScore ? state.points : state.highScore;
+
+            return {
+                ...state,
+                highScore: newHighScore,
+                timeRemains: state.timeRemains - 1,
+                status: state.timeRemains === 1 ? "finished" : "active",
             };
         }
 
@@ -83,7 +99,7 @@ function reducer(state, action) {
 }
 
 function App() {
-    const [{ questions, status, curQuesIndex, curQuesAnsIndex, points, highScore }, dispatch] = useReducer(
+    const [{ questions, status, curQuesIndex, curQuesAnsIndex, points, highScore, timeRemains }, dispatch] = useReducer(
         reducer,
         initialState
     );
@@ -91,26 +107,6 @@ function App() {
     const numQuestion = questions.length;
     const hasMoreQuestion = numQuestion > curQuesIndex + 1;
     const totalPoints = useMemo(() => questions.reduce((acc, cur) => acc + cur.points, 0), [questions]);
-
-    useEffect(() => {
-        async function fetchQuestions() {
-            try {
-                const res = await fetch("http://localhost:3000/questions");
-                const data = await res.json();
-
-                if (!res.ok) {
-                    return dispatch({ type: "dataFailed" });
-                }
-
-                dispatch({ type: "dataReceived", payload: data });
-            } catch (error) {
-                console.log(error);
-                dispatch({ type: "dataFailed" });
-            }
-        }
-
-        fetchQuestions();
-    }, []);
 
     function handleQuizStart() {
         dispatch({ type: "quizStart" });
@@ -133,6 +129,30 @@ function App() {
     function handleRestart() {
         dispatch({ type: "quizRestart" });
     }
+
+    function handleTimer() {
+        dispatch({ type: "timerCounter" });
+    }
+
+    useEffect(() => {
+        async function fetchQuestions() {
+            try {
+                const res = await fetch("http://localhost:3000/questions");
+                const data = await res.json();
+
+                if (!res.ok) {
+                    return dispatch({ type: "dataFailed" });
+                }
+
+                dispatch({ type: "dataReceived", payload: data });
+            } catch (error) {
+                console.log(error);
+                dispatch({ type: "dataFailed" });
+            }
+        }
+
+        fetchQuestions();
+    }, []);
 
     return (
         <div className="app">
@@ -157,11 +177,14 @@ function App() {
                             onNextQuestion={handleNextQuestion}
                             hasMoreQuestion={hasMoreQuestion}
                         />
+
                         {curQuesAnsIndex !== null && (
                             <button className="btn btn-ui" onClick={handleNextQuestion}>
                                 {hasMoreQuestion ? "Next" : "Finish"}
                             </button>
                         )}
+
+                        <Timer status={status} timeRemains={timeRemains} onCountTimer={handleTimer} />
                     </>
                 )}
 
