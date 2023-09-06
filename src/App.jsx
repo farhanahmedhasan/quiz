@@ -5,6 +5,7 @@ import Progress from "./Progress";
 import Question from "./Question";
 import MainContent from "./MainContent";
 import StartScreen from "./StartScreen";
+import FinishScreen from "./FinishScreen";
 import { useEffect, useMemo, useReducer } from "react";
 
 const initialState = {
@@ -14,6 +15,7 @@ const initialState = {
     curQuesIndex: 0,
     curQuesAnsIndex: null,
     points: 0,
+    highScore: 0,
 };
 
 function reducer(state, action) {
@@ -55,13 +57,28 @@ function reducer(state, action) {
             };
         }
 
+        case "finishQuiz": {
+            const newHighScore = state.points > state.highScore ? state.points : state.highScore;
+
+            return {
+                ...state,
+                status: "finished",
+                curQuesIndex: 0,
+                curQuesAnsIndex: null,
+                highScore: newHighScore,
+            };
+        }
+
         default:
             return state;
     }
 }
 
 function App() {
-    const [{ questions, status, curQuesIndex, curQuesAnsIndex, points }, dispatch] = useReducer(reducer, initialState);
+    const [{ questions, status, curQuesIndex, curQuesAnsIndex, points, highScore }, dispatch] = useReducer(
+        reducer,
+        initialState
+    );
 
     const numQuestion = questions.length;
     const hasMoreQuestion = numQuestion > curQuesIndex + 1;
@@ -96,7 +113,13 @@ function App() {
     }
 
     function handleNextQuestion() {
-        dispatch({ type: "nextQuestion" });
+        if (hasMoreQuestion) {
+            dispatch({ type: "nextQuestion" });
+        }
+
+        if (!hasMoreQuestion) {
+            dispatch({ type: "finishQuiz" });
+        }
     }
 
     return (
@@ -122,12 +145,16 @@ function App() {
                             onNextQuestion={handleNextQuestion}
                             hasMoreQuestion={hasMoreQuestion}
                         />
-                        {hasMoreQuestion && curQuesAnsIndex !== null && (
+                        {curQuesAnsIndex !== null && (
                             <button className="btn btn-ui" onClick={handleNextQuestion}>
-                                Next
+                                {hasMoreQuestion ? "Next" : "Finish"}
                             </button>
                         )}
                     </>
+                )}
+
+                {status === "finished" && (
+                    <FinishScreen points={points} totalPoints={totalPoints} highScore={highScore} />
                 )}
             </MainContent>
         </div>
