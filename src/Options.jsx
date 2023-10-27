@@ -1,8 +1,12 @@
-export default function Options({ question, curQuesAnsIndex, onNewAnswer }) {
+import {useQuizContext} from "./context/QuizContext.jsx";
+
+export default function Options() {
+    const {questions, curQuesAnsIndex,curQuesIndex, dispatch} = useQuizContext()
+    const question = questions[curQuesIndex]
     const hasAnswered = curQuesAnsIndex !== null;
 
     function handleAnswer(i) {
-        onNewAnswer(i);
+        dispatch({ type: "quiz/newAnswer", payload: i });
     }
 
     return (

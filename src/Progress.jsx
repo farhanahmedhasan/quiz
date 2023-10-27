@@ -1,4 +1,9 @@
-export default function Progress({ numQuestion, curQuesIndex, points, totalPoints, curQuesAnsIndex }) {
+import {useQuizContext} from "./context/QuizContext.jsx";
+
+export default function Progress() {
+    const {questions, curQuesIndex, points, totalPoints, curQuesAnsIndex} = useQuizContext()
+    const numQuestion = questions.length
+
     return (
         <header className="progress">
             <progress id="file" value={curQuesIndex + Number(curQuesAnsIndex !== null)} max={numQuestion} />

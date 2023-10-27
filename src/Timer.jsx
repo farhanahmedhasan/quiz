@@ -1,6 +1,16 @@
-import { useEffect } from "react";
+import {useCallback, useEffect} from "react";
+import {useQuizContext} from "./context/QuizContext.jsx";
 
-export default function Timer({ timeRemains, onCountTimer }) {
+export default function Timer() {
+    const {timeRemains, dispatch} = useQuizContext()
+
+
+    const handleTimer = useCallback(() => {
+            dispatch({ type: "quiz/timer" });
+    }, [dispatch]);
+
+
+
     let minutes = Math.floor(timeRemains / 60);
     let extraSeconds = timeRemains % 60;
 
@@ -11,11 +21,11 @@ export default function Timer({ timeRemains, onCountTimer }) {
         if (!timeRemains) return;
 
         const timer = setInterval(() => {
-            onCountTimer();
+            handleTimer();
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [timeRemains, onCountTimer]);
+    }, [timeRemains, handleTimer]);
 
     return (
         <p className="timer">
